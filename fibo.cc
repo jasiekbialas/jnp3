@@ -66,43 +66,60 @@ Fibo::Fibo(const Fibo &f) {
 
 void Fibo::operator+=(const Fibo &f) {
 
+    int last = 0;
+    size_t i = bits.size();
 
-    boost::dynamic_bitset<> add_this = f.bits;
-
-    if(add_this.size() > bits.size()) {
-        bits.resize(add_this.size(), false);
+    if(f.bits.size() > bits.size()) {
+        bits.resize(f.bits.size(), false);
+        i = bits.size();
+    } else if (f.bits.size() < bits.size()) {
+        while(i != f.bits.size()) i--;
     } else {
-        add_this.resize(bits.size(), false);
+        if(f.bits[i-1] == bits[i-1]) {
+            bits.push_back(false);
+        }
     }
 
-    bool last = false;
-    size_t i = bits.size() - 1;
-
-
-    if(bits[i] && add_this[i]) {
-        bits.push_back(true);
-    }
-
+    int test;
     while(i > 0) {
-        switch ((int)last + (int)bits[i] + (int)add_this[i]) {
+        test = last + (int)bits[i-1] + (int)f.bits[i-1];
+
+        switch (test) {
+
             case 3:
-                bits[i+2] = true;
-                bits[i] = false;
-                last = true;
-                i--;
-                i -= (bool)i;
+                bits[i+1] = true;
+                bits[i-1] = false;
+                last = 1;
+                i --;
+                if(i > 1) i --;
                 break;
             case 2:
-                bits[i+1] = true;
-                bits[i] = false;
-                bits[i-1] = bits[i-1] || add_this[i-1];
-                last = true;
-                i--;
-                i -= (bool)i;
+                if(bits[i]) {
+                    bits[i+1] = true;
+                    bits[i] = false;
+                    bits[i-1] = true;
+                    last = 0;
+                } else {
+                    bits[i] = true;
+                    bits[i-1] = false;
+                    last = 1;
+                }
+
+                if(i > 2) {
+                    if(bits[i-2] || f.bits[i-2]) {
+                        bits[i] = true;
+                        bits[i-1] = true;
+                        bits[i-2] = false;
+                        last = 0;
+                    }
+                }
+
+                i --;
+                if(i > 1) i --;
                 break;
             case 1:
-                bits[i] = true;
-                last = false;
+                bits[i-1] = true;
+                last = 0;
                 i--;
                 break;
             default:
@@ -110,22 +127,7 @@ void Fibo::operator+=(const Fibo &f) {
                 break;
         }
     }
-
-    switch ((int)last + (int)bits[0] + (int)add_this[0]) {
-        case 3:
-            bits[1] = true;
-            bits[0] = true;
-            break;
-        case 2:
-            bits[1] = true;
-            bits[0] = false;
-            break;
-        case 1:
-            bits[0] = true;
-            break;
-        default:
-            break;
-    }
+    if(test == 1) bits[0];
 
     normalise();
 }
@@ -152,7 +154,6 @@ bool Fibo::operator<(const Fibo &f) const {
     if(bits.size() > f.bits.size()) return false;
 
     for(size_t i = bits.size(); i > 0; i--) {
-        cout<<i-1<<": "<<bits[i-1]<<" "<<f.bits[i-1]<<endl;
         if(bits[i-1]) {
             if(!f.bits[i-1]) {
                 return false;
@@ -163,7 +164,7 @@ bool Fibo::operator<(const Fibo &f) const {
             }
         }
     }
-    return true;
+    return false;
 }
 
 bool Fibo::operator==(const Fibo &f) const {
@@ -196,6 +197,20 @@ const Fibo One() {
 
 void Fibo::show() {
   cout<<bits<<endl;
+}
+
+int Fibo::eval() {
+    int big = 1;
+    int small = 1;
+    int sum = 0;
+
+    for(size_t i = 0; i < bits.size(); i++) {
+        if(bits[i]) sum += big;
+        big += small;
+        small = big - small;
+    }
+
+    return sum;
 }
 
 void Fibo::move_frd(size_t i) {
