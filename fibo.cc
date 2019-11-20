@@ -64,66 +64,6 @@ Fibo::Fibo(const Fibo &f) {
   bits = f.bits;
 }
 
-//Fibo operator+(const Fibo &fst, const Fibo &snd) {
-//  Fibo r{fst};
-//  r+=snd;
-//  return r;
-//}
-//
-//Fibo operator+(const Fibo &fst, const unsigned long long n) {
-//  Fibo r{n};
-//  r += fst;
-//  return r;
-//}
-//
-//Fibo operator&(const Fibo &fst, const Fibo &snd) {
-//
-//  if(fst.bits.size() != snd.bits.size()) {
-//    throw runtime_exception("Incorrect arguments");
-//  }
-//
-//  Fibo r{fst};
-//
-//  r.bits &= snd.bits;
-//
-//  return r;
-//}
-//
-//Fibo operator|(const Fibo &fst, const Fibo &snd) {
-//  if(fst.bits.size() != snd.bits.size()) {
-//    throw "Incorrect arguments";
-//  }
-//
-//  Fibo r{fst};
-//
-//  r.bits |= snd.bits;
-//
-//  return r;
-//}
-//
-//Fibo operator^(const Fibo &fst, const Fibo &snd) {
-//  if(fst.bits.size() != snd.bits.size()) {
-//    throw "Incorrect arguments";
-//  }
-//
-//  Fibo r{fst};
-//
-//  r.bits ^= snd.bits;
-//
-//  return r;
-//}
-//
-//Fibo operator<<(const Fibo &fst, const size_t n) {
-//  Fibo r{fst};
-//  r <<= n;
-//  return r;
-//}
-//
-//void Fibo::operator=(unsigned long long n) {
-//  bits = boost::dynamic_bitset<>{1,0};
-//  initialize_to_n(n);
-//}
-
 void Fibo::operator+=(const Fibo &f) {
 
 
@@ -207,16 +147,23 @@ void Fibo::operator<<=(unsigned int n) {
 }
 
 bool Fibo::operator<(const Fibo &f) const {
-//  if (bits_.size() != f.bits_.size()) return bits_.size() < f.bits_.size();
-//  size_t id = bits_.size() - 1;
-//  do {
-//    if (bits_[id] < f.bits_[id]) return true;
-//    if (bits_[id] > f.bits_[id]) return false;
-//    id--;
-//  }
-//  while (id != 0);
 
-  return true;
+    if(bits.size() < f.bits.size()) return true;
+    if(bits.size() > f.bits.size()) return false;
+
+    for(size_t i = bits.size(); i > 0; i--) {
+        cout<<i-1<<": "<<bits[i-1]<<" "<<f.bits[i-1]<<endl;
+        if(bits[i-1]) {
+            if(!f.bits[i-1]) {
+                return false;
+            }
+        } else {
+            if(f.bits[i-1]) {
+                return true;
+            }
+        }
+    }
+    return true;
 }
 
 bool Fibo::operator==(const Fibo &f) const {
