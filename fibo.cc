@@ -155,6 +155,7 @@ void Fibo::operator+=(const Fibo &f) {
             case 2:
                 bits[i+1] = true;
                 bits[i] = false;
+                bits[i-1] = bits[i-1] || add_this[i-1];
                 last = true;
                 i--;
                 i -= (bool)i;
