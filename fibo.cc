@@ -6,38 +6,9 @@
 
 using namespace std;
 
-//void Fibo::initialize_to_n(unsigned long long n) {
-//  if(n == 0) {
-//    Fibo();
-//  } else {
-//    unsigned long long i = 0, one = 1, two, current = 1;
-//
-//    while(current <= n) {
-//      i++;
-//      current += one;
-//      two = one;
-//      one = current - one;
-//    }
-//
-//    bits = boost::dynamic_bitset<>{i, 0};
-//
-//    while(n > 0) {
-//      i--;
-//      if(n >= one) {
-//        n -= one;
-//        bits[i].flip();
-//      }
-//
-//      current = two;
-//      two =  one - two;
-//      one = current;
-//    }
-//  }
-//}
-
 Fibo::Fibo(unsigned long long n) {
     if(n == 0) {
-        Fibo();
+        bits = boost::dynamic_bitset<> {1, 0};
     } else {
         unsigned long long i = 0, one = 1, two, current = 1;
 
@@ -87,8 +58,6 @@ Fibo::Fibo(const std::string &s) {
 Fibo::Fibo() {
   bits = boost::dynamic_bitset<> {1, 0};
 }
-
-//Fibo::Fibo(boost::dynamic_bitset<> &bits) : bits(bits) {};
 
 Fibo::Fibo(const Fibo &f) {
 //  TODO test
@@ -156,83 +125,69 @@ Fibo::Fibo(const Fibo &f) {
 //}
 
 void Fibo::operator+=(const Fibo &f) {
-  if(f.bits.size() > bits.size()) {
-    bits.resize(f.bits.size(), false);
-  }
 
-  if(bits[0] && f.bits[0]) {
-    if(bits.size() == 1) bits.push_back(true);
-    bits[1] = true;
-    bits[0] = false;
-  } else if(bits[0] || f.bits[0]) {
-    bits[0] = true;
-  }
 
-  for(size_t i = 1; i < f.bits.size(); i++) {
-    if(bits[i] && f.bits[i]) {
-      bits[i] = false;
-      if(i+1 < bits.size()) {
-        bits[i+1] = true;
-      } else {
-        bits.push_back(true);
-      }
-      if(bits[i-1]) {
-        size_t j = i - 1;
-        while(bits[j]) {
-          bits[j+1] = true;
-          bits[j] = false;
-          j--;
-        }
-      } else {
-        bits[i-1] = true;
-      }
+    boost::dynamic_bitset<> add_this = f.bits;
+
+    if(add_this.size() > bits.size()) {
+        bits.resize(add_this.size(), false);
     } else {
-      bits[i] = bits[i] || f.bits[i];
+        add_this.resize(bits.size(), false);
     }
-  }
 
-  normalise();
+    bool last = false;
+    size_t i = bits.size() - 1;
+
+
+    if(bits[i] && add_this[i]) {
+        bits.push_back(true);
+    }
+
+    while(i > 0) {
+        switch ((int)last + (int)bits[i] + (int)add_this[i]) {
+            case 3:
+                bits[i+2] = true;
+                bits[i] = false;
+                last = true;
+                i--;
+                i -= (bool)i;
+                break;
+            case 2:
+                bits[i+1] = true;
+                bits[i] = false;
+                last = true;
+                i--;
+                i -= (bool)i;
+                break;
+            case 1:
+                bits[i] = true;
+                last = false;
+                i--;
+                break;
+            default:
+                i--;
+                break;
+        }
+    }
+
+    switch ((int)last + (int)bits[0] + (int)add_this[0]) {
+        case 3:
+            bits[1] = true;
+            bits[0] = true;
+            break;
+        case 2:
+            bits[1] = true;
+            bits[0] = false;
+            break;
+        case 1:
+            bits[0] = true;
+            break;
+        default:
+            break;
+    }
+
+    normalise();
 }
-//
-//void Fibo::operator+=(const unsigned long long n) {
-//  Fibo f{n};
-//  if(f.bits.size() > bits.size()) {
-//    bits.resize(f.bits.size(), false);
-//  }
-//
-//  if(bits[0] && f.bits[0]) {
-//    if(bits.size() == 1) bits.push_back(true);
-//    bits[1] = true;
-//    bits[0] = false;
-//  } else if(bits[0] || f.bits[0]) {
-//    bits[0] = true;
-//  }
-//
-//  for(size_t i = 1; i < f.bits.size(); i++) {
-//    if(bits[i] && f.bits[i]) {
-//      bits[i] = false;
-//      if(i+1 < bits.size()) {
-//        bits[i+1] = true;
-//      } else {
-//        bits.push_back(true);
-//      }
-//      if(bits[i-1]) {
-//        size_t j = i - 1;
-//        while(bits[j]) {
-//          bits[j+1] = true;
-//          bits[j] = false;
-//          j--;
-//        }
-//      } else {
-//        bits[i-1] = true;
-//      }
-//    } else {
-//      bits[i] = bits[i] || f.bits[i];
-//    }
-//  }
-//
-//  normalise();
-//}
 
 void Fibo::operator^=(const Fibo &f) {
   bits ^= f.bits;
@@ -298,8 +253,8 @@ void Fibo::show() {
 void Fibo::move_frd(size_t i) {
   i++;
   while(i < bits.size()) {
-    bits[i-1] = true;
-    bits[i] = true;
+    bits[i-1] = false;
+    bits[i] = false;
     i++;
     if(i == bits.size()) {
       bits.push_back(true);
