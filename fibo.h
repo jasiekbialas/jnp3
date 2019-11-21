@@ -14,13 +14,13 @@ class Fibo :
         public boost::bitwise<Fibo>,
         public boost::left_shiftable<Fibo, unsigned int> {
 private:
-    mutable boost::dynamic_bitset<> bits;
+    boost::dynamic_bitset<> bits;
 
-    void move_frd(size_t i) const;
+    void move_frd(size_t i);
 
-    void normalise() const;
+    void normalise();
 
-    void remove_leading_zeros() const;
+    void remove_leading_zeros();
 
 public:
     Fibo();
