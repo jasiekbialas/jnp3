@@ -16,6 +16,9 @@ int main() {
 
     cout << (Fibo("1001") ^ Fibo("1010")) << endl;
 
+//    cout << (boost::dynamic_bitset<>(4, 15) > boost::dynamic_bitset<>(5, 16)) << endl
+//         << boost::dynamic_bitset<>(5, 17)[0] << endl;
+
 //    f += 7;
 //
 
