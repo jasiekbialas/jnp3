@@ -140,7 +140,7 @@ void Fibo::operator+=(const Fibo& f)
         while (i!=f.bits.size()) i--;
     }
     else {
-        if (f.bits[i-1]==bits[i-1]) {
+        if (f.bits[i-1] && bits[i-1]) {
             bits.push_back(false);
         }
     }
