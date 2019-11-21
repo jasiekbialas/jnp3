@@ -7,12 +7,14 @@ using namespace boost;
 
 int main() {
 
-    Fibo f{7}, s{15};
+//    Fibo f{7}, s{15};
+//
+//    Fibo r = {"100000"};
+//    cout << (r << 2) << endl;
+//
+//    cout<<f<<endl;
 
-    Fibo r = {"100000"};
-    cout << (r << 2) << endl;
-
-    cout<<f<<endl;
+    cout << (Fibo("1001") ^ Fibo("1010")) << endl;
 
 //    f += 7;
 //

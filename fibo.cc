@@ -185,18 +185,22 @@ void Fibo::operator^=(const Fibo &f) {
     make_equal_size(bits, f.bits);
     bits ^= f.bits;
     f.remove_leading_zeros();
+    this->remove_leading_zeros();
+    this->normalise();
 }
 
 void Fibo::operator&=(const Fibo &f) {
     make_equal_size(bits, f.bits);
     bits &= f.bits;
     f.remove_leading_zeros();
+    this->remove_leading_zeros();
 }
 
 void Fibo::operator|=(const Fibo &f) {
     make_equal_size(bits, f.bits);
     bits |= f.bits;
     f.remove_leading_zeros();
+    this->normalise();
 }
 
 void Fibo::operator<<=(unsigned int n) {
