@@ -10,49 +10,48 @@ Fibo::Fibo(unsigned long long n) {
     if(n == 0) {
         bits = boost::dynamic_bitset<> {1, 0};
     } else {
-        unsigned long long i = 0, one = 1, two, current = 1;
+        size_t back_id = 0;
+        unsigned long long front_fib = 2, back_fib = 1;
 
-        while(current <= n) {
-            i++;
-            current += one;
-            two = one;
-            one = current - one;
+        while (0 < front_fib && front_fib <= n) {
+            front_fib = front_fib + back_fib;
+            back_fib = front_fib - back_fib;
+            back_id++;
         }
 
-        bits = boost::dynamic_bitset<>{i, 0};
+        bits = boost::dynamic_bitset<>{back_id + 1, false};
 
-        while(n > 0) {
-            i--;
-            if(n >= one) {
-                n -= one;
-                bits[i].flip();
+        while (0 < n) {
+            if (back_fib <= n) {
+                bits[back_id] = true;
+                n -= back_fib;
             }
+            back_fib = front_fib - back_fib;
+            front_fib = front_fib - back_fib;
 
-            current = two;
-            two =  one - two;
-            one = current;
+            back_id--;
         }
     }
 }
 
 Fibo::Fibo(const std::string &s) {
-  size_t n = s.length();
-  if(n == 0) {
-    throw "Incorrect input";
-  }
-  if(s[0] == '0' && n > 1) {
-    throw "Incorrect input";
-  }
-  bits = boost::dynamic_bitset<>{n, 0};
-  for(size_t i = 0; i < n; i++) {
-    if(s[i] == '1') {
-      bits[n-1-i].flip();
+    size_t n = s.length();
+    if(n == 0) {
+        throw runtime_error("Incorrect input");
     }
-    else if (s[i] != '0') {
-      throw "Incorrect input";
+    if(s[0] == '0' && n > 1) {
+        throw runtime_error("Incorrect input");
     }
-  }
-  normalise();
+
+    bits = boost::dynamic_bitset<>{n, false};
+    for(size_t i = 0; i < n; i++) {
+        if(s[i] < '0' || '1' < s[i]){
+            throw runtime_error("Incorrect input");
+        }
+        bits[n-1-i] = s[i] - '0';
+    }
+
+    normalise();
 }
 
 Fibo::Fibo() {
@@ -172,14 +171,10 @@ bool Fibo::operator==(const Fibo &f) const {
 }
 
 std::ostream &operator<<(std::ostream &os, const Fibo &f) {
-//  size_t id = f.bits_.size() - 1;
-//  do {
-//    os << f.bits_[id];
-//    id--;
-//  }
-//  while (id != 0);
-
-  return os;
+    for (size_t i = f.bits.size(); i > 0; i--) {
+        os << f.bits[i-1];
+    }
+    return os;
 }
 
 size_t Fibo::length() {
@@ -193,24 +188,6 @@ const Fibo Zero() {
 
 const Fibo One() {
   return Fibo(1);
-}
-
-void Fibo::show() {
-  cout<<bits<<endl;
-}
-
-int Fibo::eval() {
-    int big = 1;
-    int small = 1;
-    int sum = 0;
-
-    for(size_t i = 0; i < bits.size(); i++) {
-        if(bits[i]) sum += big;
-        big += small;
-        small = big - small;
-    }
-
-    return sum;
 }
 
 void Fibo::move_frd(size_t i) {

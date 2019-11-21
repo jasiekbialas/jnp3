@@ -1,8 +1,3 @@
-//
-// Created by jasiek on 19.11.19.
-//
-
-#include <boost/dynamic_bitset.hpp>
 #include <iostream>
 #include "fibo.h"
 
@@ -15,7 +10,7 @@ int main() {
     Fibo f{7}, s{15};
 
     Fibo r = {"101011"};
-    r.show();
+    cout << r << endl;
 
     cout<<f<<endl;
 
