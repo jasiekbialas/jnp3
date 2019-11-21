@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void Fibo::move_frd(size_t i) const
+void Fibo::move_frd(size_t i)
 {
     i++;
     while (i<bits.size()) {
@@ -31,7 +31,7 @@ void Fibo::move_frd(size_t i) const
     }
 }
 
-void Fibo::normalise() const
+void Fibo::normalise()
 {
     bool last = false;
 
@@ -51,7 +51,7 @@ void Fibo::normalise() const
     }
 }
 
-void Fibo::remove_leading_zeros() const
+void Fibo::remove_leading_zeros()
 {
     while (bits.size()>1 && bits[bits.size()-1]==false) {
         bits.pop_back();
@@ -129,7 +129,7 @@ void Fibo::operator+=(const Fibo& f)
         i = bits.size();
     }
     else if (f.bits.size()<bits.size()) {
-        while (i!=f.bits.size()) i--;
+        i = f.bits.size();
     }
     else {
         if (f.bits[i-1]==bits[i-1]) {
