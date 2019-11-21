@@ -6,7 +6,9 @@
 
 using namespace std;
 
-void Fibo::move_frd(size_t i)
+// Assumes (bits[size -1], bits[size-2], ... , bits[i]) has no two consecutive
+// ones and bits[i] = bits[i-1] = 1.
+void Fibo::correct_consecutive_bits(size_t i)
 {
     i++;
     while (i<bits.size()) {
@@ -18,7 +20,7 @@ void Fibo::move_frd(size_t i)
             break;
         }
         else {
-            bits[i].flip();
+            bits[i] = true;
             i++;
 
             if (i==bits.size()) {
@@ -36,21 +38,14 @@ void Fibo::normalise()
     bool last = false;
 
     for (size_t i = bits.size(); i>0; i--) {
-        if (bits[i-1]) {
-            if (last) {
-                move_frd(i-1);
-                last = false;
-            }
-            else {
-                last = true;
-            }
+        if (bits[i-1] && last) {
+            correct_consecutive_bits(i-1);
         }
-        else {
-            last = false;
-        }
+        last = bits[i-1];
     }
 }
 
+// If bits has only zeros, then it leaves one ( 00...00 = 0 ).
 void Fibo::remove_leading_zeros()
 {
     while (bits.size()>1 && bits[bits.size()-1]==false) {
@@ -58,36 +53,45 @@ void Fibo::remove_leading_zeros()
     }
 }
 
-Fibo::Fibo(unsigned long long n)
+// Returns 0;
+Fibo::Fibo()
 {
+    bits = boost::dynamic_bitset<>{1, 0};
+}
+
+Fibo::Fibo(long long n)
+{
+    if (n < 0) throw runtime_error("Incorrect input");
+
     if (n==0) {
         bits = boost::dynamic_bitset<>{1, 0};
     }
     else {
         size_t back_id = 0;
-        unsigned long long front_fib = 2, back_fib = 1;
+        long long front_fibit = 2, back_fibit = 1;
 
-        while (0<front_fib && front_fib<=n) {
-            front_fib = front_fib+back_fib;
-            back_fib = front_fib-back_fib;
+        while (0<front_fibit && front_fibit<=n) {
+            front_fibit = front_fibit+back_fibit;
+            back_fibit = front_fibit-back_fibit;
             back_id++;
         }
 
         bits = boost::dynamic_bitset<>{back_id+1, false};
 
         while (0<n) {
-            if (back_fib<=n) {
+            if (back_fibit<=n) {
                 bits[back_id] = true;
-                n -= back_fib;
+                n -= back_fibit;
             }
-            back_fib = front_fib-back_fib;
-            front_fib = front_fib-back_fib;
+            back_fibit = front_fibit-back_fibit;
+            front_fibit = front_fibit-back_fibit;
 
             back_id--;
         }
     }
 }
 
+// Returns number corresponding to string s in Fibonacci coding.
 Fibo::Fibo(const std::string& s)
 {
     size_t n = s.length();
@@ -107,16 +111,6 @@ Fibo::Fibo(const std::string& s)
     }
 
     normalise();
-}
-
-Fibo::Fibo()
-{
-    bits = boost::dynamic_bitset<>{1, 0};
-}
-
-Fibo::Fibo(const Fibo& f)
-{
-    bits = f.bits;
 }
 
 void Fibo::operator+=(const Fibo& f)
@@ -139,10 +133,9 @@ void Fibo::operator+=(const Fibo& f)
 
     int test;
     while (i>0) {
-        test = last+(int) bits[i-1]+(int) f.bits[i-1];
+        test = last+bits[i-1]+f.bits[i-1];
 
         switch (test) {
-
         case 3:
             bits[i+1] = true;
             bits[i-1] = false;
@@ -150,6 +143,7 @@ void Fibo::operator+=(const Fibo& f)
             i--;
             if (i>1) i--;
             break;
+
         case 2:
             if (bits[i]) {
                 bits[i+1] = true;
@@ -175,17 +169,18 @@ void Fibo::operator+=(const Fibo& f)
             i--;
             if (i>1) i--;
             break;
+
         case 1:
             bits[i-1] = true;
             last = 0;
             i--;
             break;
+
         default:
             i--;
             break;
         }
     }
-    if (test==1) bits[0];
 
     normalise();
 }
@@ -235,8 +230,10 @@ void Fibo::operator|=(const Fibo& f)
     this->normalise();
 }
 
-void Fibo::operator<<=(unsigned int n)
+void Fibo::operator<<=(int n)
 {
+    if (n < 0) throw runtime_error("Incorrect input");
+
     if (bits[bits.size()-1]==false) return; // This is true iff bits == {0}
     bits.resize(bits.size()+n);
     bits <<= n;
@@ -264,17 +261,19 @@ std::ostream& operator<<(std::ostream& os, const Fibo& f)
     return os;
 }
 
-size_t Fibo::length()
+size_t Fibo::length() const
 {
     return bits.size();
 }
 
-const Fibo Zero()
+const Fibo& Zero()
 {
-    return Fibo();
+    static const Fibo zero;
+    return zero;
 }
 
-const Fibo One()
+const Fibo& One()
 {
-    return Fibo(1);
+    static const Fibo one(1);
+    return one;
 }

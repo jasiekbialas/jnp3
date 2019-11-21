@@ -12,11 +12,11 @@ class Fibo :
         public boost::totally_ordered<Fibo>,
         public boost::addable<Fibo>,
         public boost::bitwise<Fibo>,
-        public boost::left_shiftable<Fibo, unsigned int> {
+        public boost::left_shiftable<Fibo, int> {
 private:
     boost::dynamic_bitset<> bits;
 
-    void move_frd(size_t i);
+    void correct_consecutive_bits(size_t i);
 
     void normalise();
 
@@ -25,11 +25,9 @@ private:
 public:
     Fibo();
 
-    Fibo(unsigned long long n);
+    Fibo(long long n);
 
-    Fibo(const std::string& s);
-
-    Fibo(const Fibo& f);
+    explicit Fibo(const std::string& s);
 
     void operator+=(const Fibo& f);
 
@@ -39,7 +37,7 @@ public:
 
     void operator|=(const Fibo& f);
 
-    void operator<<=(unsigned int n);
+    void operator<<=(int n);
 
     bool operator<(const Fibo& f) const;
 
@@ -47,11 +45,11 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const Fibo& f);
 
-    size_t length();
+    size_t length() const;
 };
 
-const Fibo Zero();
+const Fibo& Zero();
 
-const Fibo One();
+const Fibo& One();
 
 #endif //DB406645_JB385150_FIBO_H
