@@ -6,6 +6,56 @@
 
 using namespace std;
 
+static void make_equal_size(boost::dynamic_bitset<> &bits_1,
+                            boost::dynamic_bitset<> &bits_2) {
+    size_t new_size = max(bits_1.size(), bits_2.size());
+    bits_1.resize(new_size);
+    bits_2.resize(new_size);
+}
+
+void Fibo::move_frd(size_t i) const {
+    i++;
+    while(i < bits.size()) {
+        bits[i-1] = false;
+        bits[i] = false;
+        i++;
+        if(i == bits.size()) {
+            bits.push_back(true);
+            break;
+        } else {
+            bits[i].flip();
+            i++;
+
+            if(i == bits.size()) {
+                break;
+            } else if(!bits[i]) {
+                break;
+            }
+        }
+    }
+}
+
+void Fibo::normalise() const {
+    bool last = false;
+
+    for(size_t i = bits.size(); i > 0; i--) {
+        if(bits[i-1]) {
+            if(last) {
+                move_frd(i-1);
+                last = false;
+            } else {
+                last = true;
+            }
+        } else {
+            last = false;
+        }
+    }
+}
+
+void Fibo::remove_leading_zeros() const {
+    while (bits.size() > 1 && bits[bits.size() - 1] == false) bits.pop_back();
+}
+
 Fibo::Fibo(unsigned long long n) {
     if(n == 0) {
         bits = boost::dynamic_bitset<> {1, 0};
@@ -132,19 +182,27 @@ void Fibo::operator+=(const Fibo &f) {
 }
 
 void Fibo::operator^=(const Fibo &f) {
-  bits ^= f.bits;
+    make_equal_size(bits, f.bits);
+    bits ^= f.bits;
+    f.remove_leading_zeros();
 }
 
 void Fibo::operator&=(const Fibo &f) {
-  bits &= f.bits;
+    make_equal_size(bits, f.bits);
+    bits &= f.bits;
+    f.remove_leading_zeros();
 }
 
 void Fibo::operator|=(const Fibo &f) {
-  bits |= f.bits;
+    make_equal_size(bits, f.bits);
+    bits |= f.bits;
+    f.remove_leading_zeros();
 }
 
 void Fibo::operator<<=(unsigned int n) {
-  bits<<=n;
+    if (bits[bits.size() - 1] == false) return;
+    bits.resize(bits.size() + n);
+    bits<<=n;
 }
 
 bool Fibo::operator<(const Fibo &f) const {
@@ -153,14 +211,11 @@ bool Fibo::operator<(const Fibo &f) const {
     if(bits.size() > f.bits.size()) return false;
 
     for(size_t i = bits.size(); i > 0; i--) {
-        if(bits[i-1]) {
-            if(!f.bits[i-1]) {
-                return false;
-            }
-        } else {
-            if(f.bits[i-1]) {
-                return true;
-            }
+        if (bits[i-1] && !f.bits[i-1]) {
+            return false;
+        }
+        else if (!bits[i-1] && f.bits[i-1]) {
+            return true;
         }
     }
     return false;
@@ -181,50 +236,10 @@ size_t Fibo::length() {
   return bits.size();
 }
 
-
 const Fibo Zero() {
   return Fibo();
 }
 
 const Fibo One() {
   return Fibo(1);
-}
-
-void Fibo::move_frd(size_t i) {
-  i++;
-  while(i < bits.size()) {
-    bits[i-1] = false;
-    bits[i] = false;
-    i++;
-    if(i == bits.size()) {
-      bits.push_back(true);
-      break;
-    } else {
-      bits[i].flip();
-      i++;
-
-      if(i == bits.size()) {
-        break;
-      } else if(!bits[i]) {
-        break;
-      }
-    }
-  }
-}
-
-void Fibo::normalise() {
-  bool last = false;
-
-  for(size_t i = bits.size(); i > 0; i--) {
-    if(bits[i-1]) {
-      if(last) {
-        move_frd(i-1);
-        last = false;
-      } else {
-        last = true;
-      }
-    } else {
-      last = false;
-    }
-  }
 }

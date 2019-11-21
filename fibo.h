@@ -1,5 +1,5 @@
-#ifndef DB406645_JB385150_FIBO_H_
-#define DB406645_JB385150_FIBO_H_
+#ifndef DB406645_JB385150_FIBO_H
+#define DB406645_JB385150_FIBO_H
 
 #include <vector>
 #include <string>
@@ -15,9 +15,10 @@ class Fibo :
         public boost::bitwise<Fibo>,
         public boost::left_shiftable<Fibo, unsigned int> {
 private:
-    boost::dynamic_bitset<> bits;
-    void normalise();
-    void move_frd(size_t i);
+    mutable boost::dynamic_bitset<> bits;
+    void move_frd(size_t i) const;
+    void normalise() const;
+    void remove_leading_zeros() const;
 
 public:
     Fibo();
@@ -44,4 +45,4 @@ public:
 const Fibo Zero();
 const Fibo One();
 
-#endif //DB406645_JB385150_FIBO_H_
+#endif //DB406645_JB385150_FIBO_H

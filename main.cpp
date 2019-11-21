@@ -9,8 +9,8 @@ int main() {
 
     Fibo f{7}, s{15};
 
-    Fibo r = {"101011"};
-    cout << r << endl;
+    Fibo r = {"100000"};
+    cout << (r << 2) << endl;
 
     cout<<f<<endl;
 
