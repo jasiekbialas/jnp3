@@ -185,7 +185,6 @@ void Fibo::operator+=(const Fibo& f)
             break;
         }
     }
-    if (test==1) bits[0];
 
     normalise();
 }
@@ -217,7 +216,6 @@ void Fibo::operator&=(const Fibo& f)
             bits[i] &= f.bits[i];
         }
     }
-
     this->remove_leading_zeros();
 }
 
